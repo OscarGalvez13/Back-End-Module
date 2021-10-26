@@ -1,0 +1,21 @@
+{
+  "name": "node",
+  "version": "1.0.0",
+  "description": "This will be an e-commerce api",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "api",
+    "rest",
+    "ecommerce",
+    "js"
+  ],
+  "author": "@OscarGalvez13",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "faker": "^5.5.3"
+  }
+}
