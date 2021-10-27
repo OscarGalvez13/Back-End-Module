@@ -1,21 +1,23 @@
 const { request, response } = require("express");
 const express = require("express");
 const faker = require("faker");
+const authHandler = require("../Middlewares/authHandlers");
+const product = require("../useCases/Products");
+
 const router = express.Router();
 
-router.get("/products", (request, response) => {
+router.get("/", (request, response) => {
   const products = [];
   const { limit } = request.query;
 
-  for (let index = 0; index < limit; index++) {
-    products.push({
-      name: faker.commerce.productName(),
-      price: parseInt(faker.commerce.price(), 10),
-      image: faker.image.imageUrl(),
-    });
-  }
+  const products = await product.get();
+  response.json({
+    ok: true,
+    message: "Done!!",
+    payload: products,
+  });
 
-  if (limit) {
+  /* if (limit) {
     // Si tiene limite entonces
     response.json({
       ok: true,
@@ -27,10 +29,10 @@ router.get("/products", (request, response) => {
       ok: false,
       message: "El límite y la pagina son obligatorios",
     });
-  }
+  } */
 });
 
-router.get("/products/:id", (request, response) => {
+router.get("/:id", (request, response) => {
   const { id } = request.params;
   response.json({
     id,
@@ -39,7 +41,9 @@ router.get("/products/:id", (request, response) => {
   });
 });
 
-router.post("/", (request, response) => {
+//router.use(authHandler);
+
+router.post("/", async (request, response) => {
   const body = request.body;
   response.json({
     ok: true,
@@ -80,3 +84,10 @@ router.delete("/:id", (req, res) => {
 });
 
 module.exports = router;
+module.exports = {
+  get,
+  getById,
+  create,
+  del,
+  update,
+};

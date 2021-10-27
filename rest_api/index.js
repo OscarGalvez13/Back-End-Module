@@ -61,6 +61,7 @@ const faker = require("faker");
 const apiRouter = require("./routes");
 const { logErrors, errorHandler } = require("./Middlewares/errorHandlers");
 const authHandler = require("./Middlewares/authHandlers");
+const db = require("./lib/db");
 app.use(express.json());
 
 app.get("/", (request, response) => {
@@ -83,4 +84,11 @@ app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`Listening on port: http://localhost:${port}`);
+  db.connect()
+    .then(() => {
+      console.log("DB Connected");
+    })
+    .catch((error) => {
+      console.error("Connection refused");
+    });
 });
