@@ -1,75 +1,76 @@
-const { request, response } = require("express");
 const express = require("express");
 const faker = require("faker");
-const authHandler = require("../Middlewares/authHandlers");
-const product = require("../useCases/Products");
+const authHandler = require("../middlewares/authHandlers");
+const product = require("../usecases/products");
 
 const router = express.Router();
 
-router.get("/", (request, response) => {
+router.get("/", async (request, response, next) => {
   const products = [];
   const { limit } = request.query;
 
-  const products = await product.get();
-  response.json({
-    ok: true,
-    message: "Done!!",
-    payload: products,
-  });
-
-  /* if (limit) {
-    // Si tiene limite entonces
+  try {
+    const products = await product.get();
     response.json({
       ok: true,
-      payload: products,
+      message: "Done!",
+      payload: { products },
     });
-  } else {
-    //Si no tiene limite
-    response.json({
-      ok: false,
-      message: "El límite y la pagina son obligatorios",
-    });
-  } */
+  } catch (error) {
+    next(error);
+  }
 });
 
-router.get("/:id", (request, response) => {
+router.get("/:id", async (request, response, next) => {
   const { id } = request.params;
-  response.json({
-    id,
-    name: "Product 1",
-    price: 1000,
-  });
+
+  try {
+    const product = await product.getById(id);
+    response.json({
+      ok: true,
+      message: "Done!",
+      payload: { product },
+    });
+  } catch (error) {
+    next(error);
+  }
 });
 
-//router.use(authHandler);
+// router.use(authHandler);
 
-router.post("/", async (request, response) => {
-  const body = request.body;
-  response.json({
-    ok: true,
-    message: "Created successfully",
-    payload: {
-      body,
-    },
-  });
+router.post("/", async (request, response, next) => {
+  try {
+    const productData = request.body;
+    const productCreated = await product.create(productData);
+
+    response.status(201).json({
+      ok: true,
+      message: "New product created",
+      payload: {
+        product: productCreated,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
 });
 
 router.patch("/:id", (request, response) => {
   const { id } = request.params;
   const { name, price } = request.body;
+
   if (id == 99) {
-    response.json({
+    response.status(404).json({
       ok: false,
       message: "Product not found",
     });
   } else {
-    response.json({
+    response.status(201).json({
       ok: true,
-      message: `Price ${id} updated successfully`,
+      message: `Product ${id} updated successfully`,
       payload: {
         name,
         price,
-        body,
       },
     });
   }
@@ -77,17 +78,11 @@ router.patch("/:id", (request, response) => {
 
 router.delete("/:id", (req, res) => {
   const { id } = req.params;
-  //Logica para eliminar
+  // Logica para eliminar
   res.status(202).json({
     ok: true,
+    message: `Product ${id} deleted successfully`,
   });
 });
 
 module.exports = router;
-module.exports = {
-  get,
-  getById,
-  create,
-  del,
-  update,
-};
