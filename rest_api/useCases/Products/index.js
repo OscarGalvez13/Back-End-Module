@@ -10,7 +10,7 @@ const getById = async (productId) => {
   return product;
 };
 
-const create = (productData) => {
+const create = async (productData) => {
   const { name, price } = productData;
 
   const product = new Product({ name, price });
