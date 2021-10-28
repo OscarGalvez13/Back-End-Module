@@ -1,6 +1,7 @@
 const authHandler = (req, res, next) => {
-  const { auth } = req.body;
-  if (auth) {
+  const { apitoken } = req.headers;
+  console.log(req.headers);
+  if (apittoken === "Token-123") {
     next();
   } else {
     res.status(403).json({

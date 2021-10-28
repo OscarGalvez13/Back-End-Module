@@ -10,7 +10,7 @@ router.get("/", async (request, response, next) => {
   const { limit } = request.query;
 
   try {
-    const products = await product.get();
+    const products = await product.get(limit);
     response.json({
       ok: true,
       message: "Done!",
@@ -55,9 +55,21 @@ router.post("/", async (request, response, next) => {
   }
 });
 
-router.patch("/:id", (request, response) => {
+router.patch("/:id", async (request, response) => {
   const { id } = request.params;
   const { name, price } = request.body;
+
+  try {
+    const productResponse = await product.update(id, { name, price });
+    response.json({
+      status: ok,
+      ok: true,
+      message: "Done!",
+      payload: { productResponse },
+    });
+  } catch (error) {
+    next(error);
+  }
 
   if (id == 99) {
     response.status(404).json({
@@ -76,8 +88,19 @@ router.patch("/:id", (request, response) => {
   }
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", async, (req, res) => {
   const { id } = req.params;
+
+  try {
+    const deletedProduct = await product.del(id);
+    res.json({
+      ok: true,
+      message: "Product deleted successfully",
+      payload: {
+        product: deletedProduct,
+      },
+    });
+  } catch {}
   // Logica para eliminar
   res.status(202).json({
     ok: true,
