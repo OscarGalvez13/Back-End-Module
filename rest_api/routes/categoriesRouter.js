@@ -1,80 +1,88 @@
 const express = require("express");
-const router = express.Router();
 const faker = require("faker");
+const authHandler = require("../middlewares/authHandlers");
+const product = require("../usecases/products");
 
-router.get("/:id", (req, res) => {
-  id = req.params.id;
+const router = express.Router();
+
+router.get("/", async (request, response, next) => {
+  const products = [];
+  const { limit } = request.query;
+
   try {
-    res.json({
-      id,
-      categories: faker.commerce.department(),
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-router.get("/", (req, res) => {
-  const categoriesCatalog = [];
-  const { limit } = req.query;
-  try {
-    for (let index = 0; index < limit; index++) {
-      categoriesCatalog.push({
-        categories: faker.commerce.department(),
-      });
-    }
-
-    if (limit) {
-      res.json({
-        categories: categoriesCatalog,
-      });
-    } else {
-      res.json({
-        ok: false,
-        message: "El limite es obligatorios",
-      });
-    }
-  } catch (error) {
-    next(error);
-  }
-});
-
-router.post("/", (req, res) => {
-  const body = req.body;
-  try {
-    res.json({
+    const products = await product.get();
+    response.json({
       ok: true,
-      message: "Category added successfuly",
+      message: "Done!",
+      payload: { products },
     });
   } catch (error) {
     next(error);
   }
 });
 
-router.patch("/:id", (req, res) => {
-  const { id } = req.params;
-  const { category } = req.body;
+router.get("/:id", async (request, response, next) => {
+  const { id } = request.params;
 
   try {
-    res.json({
+    const product = await product.getById(id);
+    response.json({
       ok: true,
-      message: `Category ${id} Update successfuly`,
+      message: "Done!",
+      payload: { product },
     });
   } catch (error) {
     next(error);
+  }
+});
+
+// router.use(authHandler);
+
+router.post("/", async (request, response, next) => {
+  try {
+    const productData = request.body;
+    const productCreated = await product.create(productData);
+
+    response.status(201).json({
+      ok: true,
+      message: "New product created",
+      payload: {
+        product: productCreated,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.patch("/:id", (request, response) => {
+  const { id } = request.params;
+  const { name, price } = request.body;
+
+  if (id == 99) {
+    response.status(404).json({
+      ok: false,
+      message: "Product not found",
+    });
+  } else {
+    response.status(201).json({
+      ok: true,
+      message: `Product ${id} updated successfully`,
+      payload: {
+        name,
+        price,
+      },
+    });
   }
 });
 
 router.delete("/:id", (req, res) => {
   const { id } = req.params;
-  try {
-    //logica para eliminar
-    res.status(202).json({
-      ok: true,
-      message: `Category ${id} deleted successfuly`,
-    });
-  } catch (error) {
-    next(error);
-  }
+  // Logica para eliminar
+  res.status(202).json({
+    ok: true,
+    message: `Product ${id} deleted successfully`,
+  });
 });
+
 module.exports = router;

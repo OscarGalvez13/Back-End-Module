@@ -1,13 +1,18 @@
 const mongoose = require("mongoose");
+const config = require("dotenv").config();
 
 const connect = () =>
   new Promise((resolve, reject) => {
     mongoose.connect(
-      "mongodb+srv://js13Oscar:T4W2zHRv1RStJNbr@cluster0.u7vfy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
+      `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/${process.env.DB_NAME}?retryWrites=true&w=majority`,
+      //"mongodb+srv://js13Oscar:T4W2zHRv1RStJNbr@cluster0.u7vfy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
       {
         useNewUrlParser: true,
       }
     );
+
+    console.log("config", process.env);
+
     const db = mongoose.connection;
     db.on("open", () => {
       console.warn("Connection successful");
