@@ -4,6 +4,7 @@ const port = 8000;
 const apiRouter = require("./routes");
 const { logErrors, errorHandler } = require("./middlewares/errorHandlers");
 const authHandler = require("./middlewares/authHandlers");
+const authRouter = require("./routes/userRouter");
 const db = require("./lib/db");
 
 app.use(express.json());
