@@ -28,4 +28,8 @@ router.get("/:id", (req, res) => {
   });
 });
 
+router.post("/", (req, res) => {
+  const { firstname, lastname, username, password, email } = req.body;
+});
+
 module.exports = router;
